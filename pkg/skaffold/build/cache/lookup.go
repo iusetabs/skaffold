@@ -52,7 +52,6 @@ func (c *cache) lookupArtifacts(ctx context.Context, tags tag.ImageTags, platfor
 		}()
 	}
 	wg.Wait()
-
 	return details
 }
 
@@ -64,6 +63,7 @@ func (c *cache) lookup(ctx context.Context, a *latest.Artifact, tag string, plat
 
 	hash, err := h.hash(ctx, a, platforms)
 	if err != nil {
+		//println("Failed to get hash for artifact with image name" + a.ImageName)
 		return failed{err: fmt.Errorf("getting hash for artifact %q: %s", a.ImageName, err)}
 	}
 
@@ -86,6 +86,7 @@ func (c *cache) lookup(ctx context.Context, a *latest.Artifact, tag string, plat
 	}
 
 	if isLocal, err := c.isLocalImage(a.ImageName); err != nil {
+		//println("failed to fetch image with imagename " + a.ImageName)
 		return failed{err}
 	} else if isLocal {
 		return c.lookupLocal(ctx, hash, tag, entry)

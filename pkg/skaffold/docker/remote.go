@@ -90,6 +90,7 @@ func getRemoteDigest(identifier string, cfg Config, platforms []specs.Platform) 
 func RetrieveRemoteConfig(identifier string, cfg Config, platform v1.Platform) (*v1.ConfigFile, error) {
 	img, err := getRemoteImage(identifier, cfg, platform)
 	if err != nil {
+		println("getRemoteImage failed")
 		return nil, err
 	}
 
@@ -116,8 +117,10 @@ func Push(tarPath, tag string, cfg Config, platforms []specs.Platform) (string, 
 }
 
 func getRemoteImage(identifier string, cfg Config, platform v1.Platform) (v1.Image, error) {
+	println("Getting remote image " + identifier)
 	ref, err := parseReference(identifier, cfg)
 	if err != nil {
+		println("parseReference failed")
 		return nil, err
 	}
 	options := []remote.Option{
@@ -147,6 +150,7 @@ func IsInsecure(ref name.Reference, insecureRegistries map[string]bool) bool {
 func parseReference(s string, cfg Config, opts ...name.Option) (name.Reference, error) {
 	ref, err := name.ParseReference(s, opts...)
 	if err != nil {
+		println("name.ParseReference failed")
 		return nil, fmt.Errorf("parsing reference %q: %w", s, err)
 	}
 

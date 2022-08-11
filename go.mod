@@ -3,6 +3,8 @@ module github.com/GoogleContainerTools/skaffold
 go 1.17
 
 replace (
+	github.com/google/go-containerregistry => INSERT_YOUR_LOCAL_REFERENCE_HERE
+
 	github.com/googleapis/gnostic => github.com/googleapis/gnostic v0.4.1
 
 	github.com/opencontainers/image-spec => github.com/opencontainers/image-spec v1.0.2-0.20210730191737-8e42a01fb1b7

@@ -75,6 +75,7 @@ func (h *artifactHasherImpl) hash(ctx context.Context, a *latest.Artifact, platf
 
 	hash, err := h.safeHash(ctx, a, platforms.GetPlatforms(a.ImageName))
 	if err != nil {
+		//println("error with safe hash for ImageName: " + a.ImageName)
 		endTrace(instrumentation.TraceEndError(err))
 		return "", err
 	}
@@ -99,6 +100,7 @@ func (h *artifactHasherImpl) safeHash(ctx context.Context, a *latest.Artifact, p
 		func() interface{} {
 			hash, err := singleArtifactHash(ctx, h.lister, a, h.mode, platforms)
 			if err != nil {
+				//	println("single artifact hash failed " + a.ImageName)
 				return err
 			}
 			return hash
@@ -120,13 +122,18 @@ func singleArtifactHash(ctx context.Context, depLister DependencyLister, a *late
 	// Append the artifact's configuration
 	config, err := artifactConfigFunc(a)
 	if err != nil {
+		//	println("Failed to append artifacts configuration " + a.ImageName)
 		return "", fmt.Errorf("getting artifact's configuration for %q: %w", a.ImageName, err)
 	}
 	inputs = append(inputs, config)
 
+	//println("Successfully appended artifacts configuration " + a.ImageName)
+
 	// Append the digest of each input file
+	//println("Trying depListener with artifact " + a.ImageName)
 	deps, err := depLister(ctx, a)
 	if err != nil {
+		//println("Failure depLister for artifact " + a.ImageName + err.Error())
 		return "", fmt.Errorf("getting dependencies for %q: %w", a.ImageName, err)
 	}
 	sort.Strings(deps)
@@ -134,6 +141,7 @@ func singleArtifactHash(ctx context.Context, depLister DependencyLister, a *late
 	for _, d := range deps {
 		h, err := fileHasherFunc(d)
 		if err != nil {
+			//println("file hasher func failed " + a.ImageName)
 			if os.IsNotExist(err) {
 				log.Entry(ctx).Tracef("skipping dependency for artifact cache calculation, file not found %s: %s", d, err)
 				continue // Ignore files that don't exist
@@ -144,6 +152,8 @@ func singleArtifactHash(ctx context.Context, depLister DependencyLister, a *late
 		inputs = append(inputs, h)
 	}
 
+	//println("Successfully appended digest of input file " + a.ImageName)
+
 	// add build args for the artifact if specified
 	args, err := hashBuildArgs(a, mode)
 	if err != nil {
@@ -153,6 +163,8 @@ func singleArtifactHash(ctx context.Context, depLister DependencyLister, a *late
 		inputs = append(inputs, args...)
 	}
 
+	//println("Successfully added build args for the artifact " + a.ImageName)
+
 	// add build platforms
 	var ps []string
 	for _, p := range m.Platforms {
@@ -160,6 +172,8 @@ func singleArtifactHash(ctx context.Context, depLister DependencyLister, a *late
 	}
 	sort.Strings(ps)
 	inputs = append(inputs, ps...)
+
+	//println("Successfully added build platform for  " + a.ImageName)
 
 	return encode(inputs)
 }

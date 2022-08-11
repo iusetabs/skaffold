@@ -289,6 +289,7 @@ func (l *localDaemon) ConfigFile(ctx context.Context, image string) (*v1.ConfigF
 	} else {
 		cfg, err = RetrieveRemoteConfig(image, l.cfg, v1.Platform{})
 		if err != nil {
+			println("Failed to retrieve remote config")
 			return nil, err
 		}
 	}

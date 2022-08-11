@@ -407,6 +407,7 @@ func parseOnbuild(ctx context.Context, image string, cfg Config) ([]*parser.Node
 	// Image names are case SENSITIVE
 	img, err := RetrieveImage(ctx, image, cfg)
 	if err != nil {
+		println("Retrieve Image Failed")
 		return nil, fmt.Errorf("retrieving image %q: %w", image, err)
 	}
 
@@ -453,6 +454,7 @@ func unquote(v string) string {
 func retrieveImage(ctx context.Context, image string, cfg Config) (*v1.ConfigFile, error) {
 	localDaemon, err := NewAPIClient(ctx, cfg)
 	if err != nil {
+		println("Failed to get docker client")
 		return nil, fmt.Errorf("getting docker client: %w", err)
 	}
 
